@@ -25,25 +25,38 @@ void menu_printf(COM_HANDLE com_handle, char *fmt, ...);
 void menu_display(COM_HANDLE com_handle, char *host, ushort *port) {
 	// Get the sections from menu.ini
 	str_list_t MenuIniContents = NULL;
-	FILE *fp = fopen(menu_ini_path, "r");
-	if (fp != NULL) {
-		lprintf(LOG_INFO, "Reading %s", menu_ini_path);
-		MenuIniContents = iniReadFile(fp);
-		fclose(fp);
+	if (fexist(menu_ini_path)) {
+		FILE *fp = fopen(menu_ini_path, "r");
+		if (fp != NULL) {
+			lprintf(LOG_INFO, "Reading %s", menu_ini_path);
+			MenuIniContents = iniReadFile(fp);
+			fclose(fp);
+
+			if (iniGetSectionCount(MenuIniContents, NULL) == 0) {
+				lprintf(LOG_ERR, "No hotkey entries found in %s", menu_ini_path);
+				return; // No entries in menu.ini means no modifying host and port
+			}
+		}
+		else {
+			lprintf(LOG_ERR, "Error reading %s", menu_ini_path);
+			return; // No menu.ini means no modifying host and port
+		}
 	}
 	else {
-		lprintf(LOG_ERR, "Error reading %s", menu_ini_path);
+		lprintf(LOG_WARNING, "File not found: %s", menu_ini_path);
 		return; // No menu.ini means no modifying host and port
 	}
 
 	// Display menu.ans, if it exists
 	BOOL DisplayedMenuAns = FALSE;
 	if (fexist(menu_ansi_path)) {
-		char buf[1024];
-		int buflen;
-
-		if ((fp = fopen(menu_ansi_path, "rb")) != NULL) {
+	
+		FILE *fp = fopen(menu_ansi_path, "rb");
+		if (fp != NULL) {
 			lprintf(LOG_INFO, "Displaying %s", menu_ansi_path);
+
+			char buf[1024];
+			int buflen;
 			while ((buflen = fread(buf, 1, 1024 - 1, fp)) > 0)
 			{
 				buf[buflen] = '\0';
@@ -59,7 +72,7 @@ void menu_display(COM_HANDLE com_handle, char *host, ushort *port) {
 	}
 	else
 	{
-		lprintf(LOG_WARNING, "%s does not exist", menu_ansi_path);
+		lprintf(LOG_WARNING, "File not found: %s", menu_ansi_path);
 	}
 
 	// Display hardcoded menu if menu.ans could not be displayed
@@ -90,7 +103,7 @@ void menu_display(COM_HANDLE com_handle, char *host, ushort *port) {
 
 		// Try to get a key from the dial-up user
 		if (IsDebuggerPresent()) {
-			ch[0] = getchar();
+			ch[0] = getch();
 		}
 		else
 		{
@@ -106,6 +119,8 @@ void menu_display(COM_HANDLE com_handle, char *host, ushort *port) {
 			iniGetString(MenuIniContents, ch, "Name", "Unknown BBS", Name);
 			iniGetExistingString(MenuIniContents, ch, "Hostname", host, host);
 			*port = iniGetShortInt(MenuIniContents, ch, "Port", *port);
+
+			menu_printf(com_handle, "\r\n");
 			lprintf(LOG_INFO, "User selected %s (%s:%d)", Name, host, *port);
 			break;
 		}

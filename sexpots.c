@@ -1695,6 +1695,7 @@ int main(int argc, char** argv)
 	// If we're debugging, call menu_display now so we can test it
 	if (IsDebuggerPresent()) {
 		menu_display(com_handle, host, &port);
+		getch();
 		return 0;
 	}
 	// RickParrish End
