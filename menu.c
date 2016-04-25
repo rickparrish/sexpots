@@ -12,6 +12,7 @@
 #include "comio.h"
 
 /* RickParrish */
+#include <conio.h>
 #include "menu.h"
 
 static menu_carrier_detect carrier_detect;
@@ -103,7 +104,7 @@ void menu_display(COM_HANDLE com_handle, char *host, ushort *port) {
 
 		// Try to get a key from the dial-up user
 		if (IsDebuggerPresent()) {
-			ch[0] = getch();
+			ch[0] = _getch();
 		}
 		else
 		{

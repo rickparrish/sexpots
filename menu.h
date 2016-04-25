@@ -1,9 +1,6 @@
 #ifndef _MENU_H
 #define _MENU_H
 
-#include <Windows.h>
-#include <WinDef.h>
-
 #if defined(__cplusplus)
 extern "C" {
 #endif

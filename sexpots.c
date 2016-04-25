@@ -52,6 +52,7 @@
 #include "telnet.h"
 
 /* RickParrish */
+#include <conio.h>
 #include "menu.h"
 
 /* constants */
@@ -1695,7 +1696,7 @@ int main(int argc, char** argv)
 	// If we're debugging, call menu_display now so we can test it
 	if (IsDebuggerPresent()) {
 		menu_display(com_handle, host, &port);
-		getch();
+		_getch();
 		return 0;
 	}
 	// RickParrish End
