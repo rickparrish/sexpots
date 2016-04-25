@@ -130,6 +130,7 @@
   <ItemGroup>
     <ClCompile Include="..\comio\comio.c" />
     <ClCompile Include="..\comio\comio_win32.c" />
+    <ClCompile Include="menu.c" />
     <ClCompile Include="sexpots.c" />
     <ClCompile Include="..\sbbs3\telnet.c" />
   </ItemGroup>
@@ -140,6 +141,9 @@
     <ProjectReference Include="..\xpdev\xpdev_mt.vcxproj">
       <Project>{aeed3a81-3a47-4953-be51-fd5e08283890}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="menu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

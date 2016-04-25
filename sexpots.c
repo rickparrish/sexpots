@@ -51,6 +51,9 @@
 /* sbbs */
 #include "telnet.h"
 
+/* RickParrish */
+#include "menu.h"
+
 /* constants */
 #define NAME					"SEXPOTS"
 #define TITLE					"Synchronet External POTS Support"
@@ -1596,6 +1599,13 @@ service_loop(int argc, char** argv)
 		comWriteByte(com_handle,'\r');
 		comWriteString(com_handle, banner);
 		comWriteString(com_handle, "\r\n");
+
+		// RickParrish Start
+		menu_display(com_handle, host, &port);
+		if (!carrier_detect(com_handle)) /* hung-up at "which server?" menu */
+			continue;
+		// RickParrish End
+
 		if((sock=connect_socket(host, port)) == INVALID_SOCKET) {
 			comWriteString(com_handle,"\7\r\n!ERROR connecting to TCP port\r\n");
 		} else {
@@ -1677,6 +1687,17 @@ int main(int argc, char** argv)
 
 	iniFileName(ini_fname,sizeof(ini_fname),path,fname);
 	parse_ini_file(ini_fname);
+
+	// RickParrish Start
+	// Set some values that will be used in menu.c
+	menu_init(argv[0], &terminated, &carrier_detect, &lprintf);
+
+	// If we're debugging, call menu_display now so we can test it
+	if (IsDebuggerPresent()) {
+		menu_display(com_handle, host, &port);
+		return 0;
+	}
+	// RickParrish End
 
 #if defined(_WIN32)
 	if(daemonize) {
