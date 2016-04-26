@@ -61,7 +61,7 @@ void menu_display(COM_HANDLE com_handle, char *host, ushort *port) {
 			while ((buflen = fread(buf, 1, 1024 - 1, fp)) > 0)
 			{
 				buf[buflen] = '\0';
-				menu_printf("%s", buf);
+				menu_printf(com_handle, "%s", buf);
 			}
 			fclose(fp);
 			DisplayedMenuAns = TRUE;
