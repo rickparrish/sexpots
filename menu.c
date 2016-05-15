@@ -51,7 +51,6 @@ void menu_display(COM_HANDLE com_handle, char *host, ushort *port) {
 	// Display menu.ans, if it exists
 	BOOL DisplayedMenuAns = FALSE;
 	if (fexist(menu_ansi_path)) {
-	
 		FILE *fp = fopen(menu_ansi_path, "rb");
 		if (fp != NULL) {
 			lprintf(LOG_INFO, "Displaying %s", menu_ansi_path);
@@ -92,8 +91,15 @@ void menu_display(COM_HANDLE com_handle, char *host, ushort *port) {
 	}
 
 	// Wait for hotkey to be pressed
+	time_t start = time(NULL);
 	BYTE ch[2] = "\0\0";
 	while (!(*terminated)) {
+		if (time(NULL) - start >= 60) {
+			menu_printf(com_handle, "\r\n");
+			lprintf(LOG_WARNING, "Timeout waiting for user to pick an option, using default");
+			break;
+		}
+
 		// Watch for carrier being dropped
 		if (!IsDebuggerPresent()) {
 			if (!carrier_detect(com_handle)) {
@@ -104,6 +110,10 @@ void menu_display(COM_HANDLE com_handle, char *host, ushort *port) {
 
 		// Try to get a key from the dial-up user
 		if (IsDebuggerPresent()) {
+			if (!kbhit()) {
+				YIELD();
+				continue;
+			}
 			ch[0] = _getch();
 		}
 		else
